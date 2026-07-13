@@ -183,6 +183,8 @@ The network pump runs every Unity frame, but the game state is not serialized as
 
 This is near-real-time cooperative play, not deterministic lockstep and not video/screen sharing. Every peer renders its own ONI instance; the host is the simulation authority and packets reconcile selected state.
 
+Optimization target is not a global 64 TPS world simulation. Keep rendering and network polling frame-rate driven, make player commands immediate/event-driven and host-ordered, render cursors/entities every frame from buffered snapshots, use adaptive 20–30 Hz active-entity snapshots (optional 60 Hz cursor mode on LAN), and retain lower-rate dirty deltas plus authoritative reconciliation for world systems. Full target cadence and bandwidth rationale are in `docs/SYNC_PERFORMANCE_ROADMAP.md`.
+
 High-risk directories:
 
 - `ONI_Together/Patches/`
