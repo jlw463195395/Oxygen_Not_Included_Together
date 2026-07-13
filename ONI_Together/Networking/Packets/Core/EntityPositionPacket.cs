@@ -6,6 +6,7 @@ using System.IO;
 using Shared.Profiling;
 using UnityEngine;
 using Shared.Interfaces.Networking;
+using Shared.Networking;
 
 public class EntityPositionPacket : IPacket, IViewportCullable
 {
@@ -58,7 +59,7 @@ public class EntityPositionPacket : IPacket, IViewportCullable
 			if (!handler)
 				return;
 
-			if (handler.serverTimestamp > Timestamp)
+			if (!SnapshotOrdering.IsStrictlyNewer(handler.serverTimestamp, Timestamp))
 				return;
 
             handler.serverPosition = Position;
@@ -66,6 +67,7 @@ public class EntityPositionPacket : IPacket, IViewportCullable
             handler.serverFlipX = FlipX;
 			handler.serverFlipY = FlipY;
 			handler.serverNavType = NavType;
+            handler.MarkServerSnapshotReceived();
         }
 		else
 		{

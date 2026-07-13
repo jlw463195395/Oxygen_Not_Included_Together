@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>ONI_Together.Core.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../Shared/Networking/SnapshotFreshness.cs" Link="Production/SnapshotFreshness.cs" />
+    <Compile Include="../../Shared/Networking/SnapshotOrdering.cs" Link="Production/SnapshotOrdering.cs" />
+    <Compile Include="../../Shared/Networking/FrameActionQueue.cs" Link="Production/FrameActionQueue.cs" />
+  </ItemGroup>
+</Project>

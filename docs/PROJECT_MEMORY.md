@@ -92,6 +92,8 @@ Primary entry point:
 - checks inactive save transfers on clients;
 - flushes transport packet queues.
 
+Phase 0 synchronization foundations are recorded in `docs/implementation/2026-07-13-phase0-sync-foundations.md`. The maintained branch now uses receiver-local monotonic time for entity snapshot freshness and a thread-safe, bounded per-frame FIFO for TCP/background callbacks. Pure regression tests run independently of ONI under `tests/`, but the Unity integration still requires a full U59 build and dual-instance runtime verification.
+
 ## Session, transport, and connection state
 
 Key files:

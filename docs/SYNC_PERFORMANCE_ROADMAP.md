@@ -21,8 +21,9 @@
 - `docs/audits/2026-07-13-sync-correctness.md`
 - `docs/audits/2026-07-13-network-performance.md`
 - `docs/audits/2026-07-13-gameplay-sync-coverage.md`
+- `docs/implementation/2026-07-13-phase0-sync-foundations.md`
 
-这些结论均为静态代码审计；在取得 U59 程序集并完成兼容编译、双实例和故障注入前，不宣称运行时复现或修复完成。
+前三份结论来自静态代码审计。Phase 0 已开始修复本地时钟新鲜度和主线程回调队列，并在 8ka 通过不依赖 ONI 的聚焦测试；在取得 U59 程序集并完成兼容编译、双实例和故障注入前，仍不宣称 Unity 集成或运行时行为已验证。
 
 ## 总体判断
 
@@ -135,8 +136,9 @@
 - 每位客户端可能分别生成不同时间点的存档；
 - Hard Sync 期间仍可能发生世界写操作；
 - 结束时间靠估算，不等待真实下载、加载和重连；
-- `HardSyncCompletePacket` 没有发送点；
-- 客户端断线可能永久卡住 Ready barrier。
+- 实际完成通知依赖无 epoch 的 Ready 状态和 `AllClientsReadyPacket`，没有明确的同代次 commit；
+- 客户端断线可能永久卡住 Ready barrier；
+- TCP 失败后的 UDP fallback 会重新生成存档，可能不再是最初宣布的快照。
 
 目标流程：
 

@@ -1,5 +1,6 @@
 using System;
 using ONI_Together.Networking.Packets.Core;
+using Shared.Networking;
 using Shared.Profiling;
 using UnityEngine;
 
@@ -26,6 +27,7 @@ namespace ONI_Together.Networking.Components
         private const float LERP_SPEED = 20f;
 
         private float _lastRequestTime;
+        private float _lastServerSnapshotReceivedAt;
         private const float REQUEST_COOLDOWN = 0.5f;
         private const float STALE_THRESHOLD = 2f;
 		private const float HEARTBEAT_INTERVAL = 1f;
@@ -71,10 +73,20 @@ namespace ONI_Together.Networking.Components
                 int cell = Grid.PosToCell(transform.position);
                 if (WorldStateSyncer.IsCellInRect(cell, viewport) && Time.unscaledTime - _lastRequestTime > REQUEST_COOLDOWN)
                 {
-                    // serverTimestamp is stale or we've never heard from the host
-                    if (serverTimestamp == 0 || Time.unscaledTime - (serverTimestamp / 1000f) > STALE_THRESHOLD)
+                    // Measure age with the receiver's monotonic clock. The host's Unix
+                    // timestamp is only valid for ordering host snapshots, not for
+                    // comparing against this process's Time.unscaledTime.
+                    if (SnapshotFreshness.IsStale(
+                        serverTimestamp != 0,
+                        _lastServerSnapshotReceivedAt,
+                        Time.unscaledTime,
+                        STALE_THRESHOLD))
                     {
-                        PacketSender.SendToHost(new EntityPositionRequestPacket { NetId = this.GetNetId() });
+                        PacketSender.SendToHost(new EntityPositionRequestPacket
+                        {
+                            RequesterId = MultiplayerSession.LocalUserID,
+                            NetId = this.GetNetId()
+                        });
                         _lastRequestTime = Time.unscaledTime;
                     }
                 }
@@ -120,6 +132,11 @@ namespace ONI_Together.Networking.Components
 	        catch (Exception)
 	        {
 	        }
+        }
+
+        public void MarkServerSnapshotReceived()
+        {
+            _lastServerSnapshotReceivedAt = Time.unscaledTime;
         }
 
         private void UpdatePosition()
