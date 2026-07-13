@@ -302,6 +302,17 @@ Therefore maintenance verification must combine:
 - Steam and Riptide use different connection identity types hidden behind `object`, increasing runtime-cast risk.
 - Dedicated-server code exists but should not be represented as a supported headless ONI runtime.
 
+## Static synchronization and performance audit
+
+The 2026-07-13 gameplay-first audit is preserved in:
+
+- `docs/SYNC_PERFORMANCE_ROADMAP.md`
+- `docs/audits/2026-07-13-sync-correctness.md`
+- `docs/audits/2026-07-13-network-performance.md`
+- `docs/audits/2026-07-13-gameplay-sync-coverage.md`
+
+Highest-priority findings are non-atomic Hard Sync, save-transfer generation collisions, broken normal reconnect, unreliable state without revisions, LAN chunk loss/leaks, incorrect client stale-repair guards, non-authoritative concurrent tool commands, incomplete building topology recovery, and major gameplay gaps in resources, critters, equipment, skills, solid conduits, electrical topology, and U59 aquatic systems. These are static findings until reproduced and measured with U59 host/client instances on 8ka.
+
 ## First maintenance priorities
 
 Before broad feature development, establish and continuously improve on 8ka:
