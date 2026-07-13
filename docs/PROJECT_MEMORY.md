@@ -164,6 +164,23 @@ The codebase synchronizes behavior through several layers:
 - Bulk packets aggregate high-frequency compatible payloads.
 - Save transfer and hard sync repair accumulated divergence.
 
+## Runtime sync cadence
+
+The network pump runs every Unity frame, but the game state is not serialized as a full-frame stream. Synchronization is hybrid and subsystem-specific:
+
+- Remote cursors and their build/drag/path visualizers are sent every `0.1s` (nominally 10 Hz) and interpolated locally.
+- Host entity positions are checked every frame. A packet is sent after at least `0.016s` when movement exceeds `0.05` world units, plus a `1s` heartbeat. Clients lerp small errors and snap errors above `1.5` units.
+- Duplicant action, animation, target, held-item, and working state are checked every `200ms`, sent on change, and forced by a `1s` heartbeat.
+- Detailed duplicant chore/errand UI snapshots are subscription-driven and sent every `0.5s` or immediately when requested.
+- Work progress and many structure snapshots use about `0.5s`; automation state uses `1s`; vitals use `1s`; aggregate resources use `3s`.
+- Gas/liquid reconciliation starts from `1.5s` and adapts upward under load.
+- Dig, mop/chore, and research reconciliation are staggered one category per second, so each category normally repeats every `4s`.
+- Building inventory reconciliation is a `30s` safety pass; normal building actions are event-driven and should appear much sooner.
+- The first `5s` after world load is a grace period for several background syncers, not a permanent five-second gameplay delay.
+- The save-transfer `5s` value is a missing-chunk ACK retransmission timeout, not the visual or gameplay synchronization interval.
+
+This is near-real-time cooperative play, not deterministic lockstep and not video/screen sharing. Every peer renders its own ONI instance; the host is the simulation authority and packets reconcile selected state.
+
 High-risk directories:
 
 - `ONI_Together/Patches/`
@@ -242,7 +259,13 @@ As of this review:
 - Ignored `Directory.Build.props.user` is configured with:
   - game libraries: `/opt/mengyao-build/oni-game/OxygenNotIncluded_Data/Managed`
   - Mod output: `/opt/mengyao-build/oni-mod-output`
+- Official SteamCMD is installed under `/opt/mengyao-build/steamcmd`.
+- The repository currently declares ONI target build `700386` (`U57`).
+- Current Steam public ONI as reviewed on 2026-07-13 is `U59-740622`, Steam build `24096873` (released 2026-07-07).
+- The U57-to-U59 mismatch is a compatibility migration to verify, not merely a missing-file problem. Expect Klei/Unity API and Harmony target changes.
+- An anonymous SteamCMD install was attempted and correctly refused with `No subscription`; ONI is paid content. Acquire it by copying from a legitimately owned installation or by authenticating SteamCMD interactively with an owning account. Never store Steam credentials in Git or scripts.
 - ONI Managed DLLs are not yet present on 8ka.
+- The Linux publicizer documentation additionally requires the .NET 6 runtime; the installed .NET 8 SDK alone may not satisfy that tool.
 - No build or test has been run at this baseline because the licensed game references are missing.
 
 The ONI files must be supplied from a legitimately owned installation without checking them into Git. Place them in a controlled, untracked location on 8ka and point `Directory.Build.props.user` to that location.
@@ -254,7 +277,7 @@ The repository has in-game/debug test infrastructure under:
 - `ONI_Together/DebugTools/UnitTests/`
 - `ONI_Together/Tests/`
 
-These are not equivalent to a mature standalone CI test suite. The only GitHub workflow currently present is a disabled API publishing workflow; it is not an active full Mod build/test gate.
+These are not equivalent to a mature standalone CI test suite. The only GitHub workflow currently present is named `DISABLED_publish.yml`, but GitHub still reports it as active: renaming a workflow file does not disable it. Its only recorded `v0.7.3` run failed while compiling `Shared` because the runner lacked the licensed ONI/Unity/Harmony references. It is not a working full-Mod build/test gate.
 
 Therefore maintenance verification must combine:
 
