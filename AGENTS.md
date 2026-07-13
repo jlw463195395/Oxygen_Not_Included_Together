@@ -23,6 +23,16 @@
 9. Every client and host in a multiplayer test must use the exact same game build, DLC configuration, mod DLL, packet registry, and protocol version.
 10. Do not call a change verified until fresh build/test/runtime evidence exists from 8ka after the final edit.
 
+## Product priority
+
+This is a trusted friends/family co-op Mod for a single-player colony simulation. Optimize for gameplay, true concurrent control, low latency, visual continuity, simulation agreement, and recovery from drift.
+
+- Do not spend maintenance time on account authentication, authorization systems, anti-cheat, adversarial clients, player-owned inventories, or per-player asset isolation unless the user explicitly changes scope.
+- Player/connection IDs are routing and session-lifecycle tools, not a security boundary.
+- Prioritize player-visible synchronization: cursors and tools, duplicant movement/animation/chores, buildings, world cells, conduits, automation, resources, plants/critters, pause/speed, save loading, reconnect, and hard sync.
+- Treat frame pacing, network bandwidth, GC pressure, packet loss behavior, interpolation, viewport catch-up, and host/client divergence as first-class correctness concerns.
+- Every networking review must actively search for synchronization bugs, stale state, unsynchronized gameplay paths, latency spikes, redundant scans/packets, and avoidable hard syncs.
+
 ## One-way upstream synchronization
 
 Preferred flow:

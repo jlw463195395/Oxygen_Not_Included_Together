@@ -25,6 +25,8 @@ All builds, restores required for builds, tests, game launches, packaging, and r
 
 ONI Together adds cooperative control over one shared Oxygen Not Included colony. It is not player-owned duplicants or separate colonies. The host is authoritative for major simulation state; clients send commands and consume synchronized state/events. The project compensates for incomplete live synchronization with save transfer and optional/manual hard sync.
 
+Maintenance scope is deliberately gameplay-first. This is trusted friends/family co-op, so account authentication, authorization, anti-cheat, adversarial-client hardening, per-player inventory ownership, and asset isolation are out of scope unless explicitly requested. Connection/player identifiers matter only for correct packet routing, reconnect, cursor ownership, and cleanup. Engineering effort goes to real-time concurrent control, low latency, smooth interpolation, complete gameplay coverage, host/client agreement, performance, and fast recovery from drift.
+
 Supported network choices are abstracted behind transport interfaces:
 
 - Steamworks lobby/P2P transport;
@@ -302,12 +304,14 @@ Therefore maintenance verification must combine:
 
 ## First maintenance priorities
 
-Before broad feature development, establish on 8ka:
+Before broad feature development, establish and continuously improve on 8ka:
 
-1. licensed ONI Managed references for the exact supported game build;
-2. reproducible `Directory.Build.props.user` generation outside Git;
-3. clean restore/build/package command;
-4. a packet registry and serialization compatibility gate;
-5. a two-instance host/client smoke harness or documented manual equivalent;
-6. log collection for host and client;
-7. a release manifest containing Git commit, upstream base, Mod version, protocol version, ONI build, artifact SHA-256, and tested DLC configuration.
+1. a two-instance host/client smoke harness with synchronized video, timestamps, logs, packet metrics, and automated state comparisons;
+2. an exhaustive gameplay synchronization matrix covering tools, duplicants, chores, buildings, world cells, conduits, automation, resources, plants/critters, pause/speed, save/load, reconnect, and hard sync;
+3. latency, jitter, packet-loss, bandwidth, host-frame-time, client-frame-time, allocation, and GC measurements under representative 2-4 player colonies;
+4. fixes for player-visible divergence, stale viewport state, jerky movement/animation, delayed actions, dropped unreliable updates, duplicate execution, and unnecessary hard syncs;
+5. licensed ONI U59 Managed references and compatibility migration from declared target `U57-700386` to current `U59-740622`;
+6. reproducible remote restore/build/package commands plus packet-registry and serialization compatibility checks;
+7. host/client log collection and a release manifest containing Git commit, upstream base, Mod version, protocol version, ONI build, artifact SHA-256, tested DLC configuration, and measured multiplayer performance.
+
+Authentication, authorization, anti-cheat, adversarial-client security, per-player item ownership, and player asset isolation are not maintenance priorities for this private cooperative game.
